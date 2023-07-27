@@ -18,7 +18,7 @@ app.use(cors({
 app.use(cookieParser());//for parsing cookie data
 
 //general route for testing
-app.use('/hello',(req,res)=>{
+app.post('/hello',(req,res)=>{
   res.send('aligarh')
 })
 
