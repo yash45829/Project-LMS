@@ -2,10 +2,14 @@ import path from 'path';
 import multer from 'multer';
 
 
+// not completed
 const upload = multer({
-    dest : "uploads/",
+    // dest : "uploads/",
     limits: { fileSize:50*1024*1024 },
     storage: multer.diskStorage({
+      destination: (_req,file, cb) => {
+        cb(null, "uploads/");
+      },
         filename : (_req,file,cb)=>{
             cb(null,file.originalname);
           },
@@ -29,6 +33,7 @@ const upload = multer({
           cb(null,true);
     }
   
+   
 });
 
 export default upload ;

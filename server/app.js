@@ -10,6 +10,7 @@ app.use(morgan('dev')) // for logging
 
 app.use(express.json());// for parsing json data 
 
+app.use(express.urlencoded({extended: true}))
 //for connectivity between frontend and backend
 app.use(cors({
     origin : process.env.FRONTEND_URL,
@@ -18,7 +19,7 @@ app.use(cors({
 app.use(cookieParser());//for parsing cookie data
 
 //general route for testing
-app.post('/hello',(req,res)=>{
+app.use('/hello',(req,res)=>{
   res.send('aligarh')
 })
 

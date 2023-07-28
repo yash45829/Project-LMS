@@ -1,163 +1,247 @@
 import User from "../models/user.model.js";
-import cloudinary from 'cloudinary' ;
-import comparePassword from '../models/user.model.js'
+import cloudinary from "cloudinary";
+import comparePassword from "../models/user.model.js";
+import crypto from "crypto";
+import fs from "fs/promises";
+import sendEmail from "../utils/sendEmail.js";
 
+// session time
 const cookieOptions = {
-    maxAge : 7*24*60*60*1000 ,
-    httpOnly : true,
-    secure : true 
-}
+  maxAge: 7 * 24 * 60 * 60 * 1000,
+  httpOnly: true,
+  secure: true,
+};
 
-// REGISTER 
-const register = async (req,res)=>{
+// REGISTER
+const register = async (req, res) => {
+  const { firstname, email, password } = req.body;
 
-const {firstname,email,password} = req.body;
+  if (!firstname || !email || !password) {
+    return res.status(500).send("required email");
+  }
 
-if(!firstname || !email || !password){
- return res.status(500).send('required email');
-}
+  const isUserExist = await User.findOne({ email });
 
-const isUserExist = await User.findOne({email});
+  if (isUserExist) {
+    return res.status(500).send("account exist");
+  }
 
-if(isUserExist){
-    return res.status(500).send('account exist');
-}
+  const user = await User.create({
+    firstname,
+    email,
+    password,
+    avatar: {
+      public_id: email,
+      secure_url: "",
+    },
+  });
 
-const user = await User.create({
-firstname,
-email,
-password,
-avatar : {
-  public_id : email,
-  secure_url : '',
-}
-})
+  if (!user) {
+    return res.status(500).send("not created");
+  }
 
-if(!user){
-    return res.status(500).send('not created');
-}
-// 
-cloudinary.url("sample.jpg", {width: 100, height: 150, crop: "fill", fetch_format: "auto"})
-
-cloudinary.v2.uploader.upload("", {upload_preset: "my_preset"}, (error, result)=>{
-  console.log(result, error);
-});
-
-
-await user.save();
-
-user.password = undefined ;
-
-const token  = user.generateJWTToken();
-
-res.cookie('token',token,cookieOptions);
-
-res.status(200).json({
-    success : true ,
-    message : 'user created happy',
-    user
-})
-
-}
-
-// LOGIN 
-const login = (req,res)=>{
+  // uploading file to cloudinary
+  console.log(req.file);
+  if (req.file) {
     try {
-        const {email,password} = req.body;
+      const result = cloudinary.v2.uploader.upload(req.file.path, {
+        folder: "lms",
+        width: 250,
+        height: 250,
+        gravity: "faces",
+        crop: "fill",
+      });
+      if (result) {
+        user.avatar.public_id = (await result).public_id;
+        user.avatar.secure_url = (await result).secure_url;
 
-        if(!email){
-            return res.status(500).send('required email');
-           }
-           if(!password){
-            return res.status(500).send('required password');
-
-           }
-        
-        const user = User.findOne({email}).select('+password');
-   
-        if(!user || ! comparePassword(password)){
-         return res.status(500).send('email or password are wrong');
-        }
-
-        user.password = undefined ;
-        const token = user.generateJWTToken();
-        
-        res.cookie('token',token,cookieOptions);
-
-        res.status(200).json({
-         success : true ,
-         message : 'login user',
-         user
-        })
-
+        // fs.rm(`uploads/${req.file.filename}`)
+      }
     } catch (error) {
-        return res.status(500).send(`email or password are wrong this is ${error}`);
+      return res.status(500).send("error in saving image");
     }
-   
-}
+  }
 
-// LOGOUT 
+  await user.save();
 
-const logout = (req,res)=>{
- try {
-  res.cookie('token',null,{
-    maxAge : 0,
-    httpOnly : true,
-    secure: true
-  })
+  user.password = undefined;
+
+  const token = user.generateJWTToken();
+
+  res.cookie("token", token, cookieOptions);
 
   res.status(200).json({
     success: true,
-    message : 'logout container',
+    message: "user created happy",
+    user,
+  });
+};
+/**************************************************************** */
+// LOGIN
+const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
 
-  })
- } catch (error) {
-  res.status(400).json({
-    message: `${error}`
-  })
- }
+    if (!email) {
+      return res.status(500).send("required email");
+    }
+    if (!password) {
+      return res.status(500).send("required password");
+    }
 
-}
+    const user = await User.findOne({ email }).select("+password");
 
-// PROFILE 
-const profile = async (req,res)=>{
-  
+    if (!user || !comparePassword(password)) {
+      return res.status(500).send("email or password are wrong");
+    }
+
+    user.password = undefined;
+    const token = await user.generateJWTToken();
+
+    res.cookie("token", token, cookieOptions);
+
+    res.status(200).json({
+      success: true,
+      message: "login user",
+      user,
+    });
+  } catch (error) {
+    return res.status(500).send(`email or password are wrong this is ${error}`);
+  }
+};
+/**************************************************************** */
+// LOGOUT
+const logout = (req, res) => {
+  try {
+    res.cookie("token", null, {
+      maxAge: 0,
+      httpOnly: true,
+      secure: true,
+    });
+
+    res.status(200).json({
+      success: true,
+      message: "logout container",
+    });
+  } catch (error) {
+    res.status(400).json({
+      message: `${error}`,
+    });
+  }
+};
+/**************************************************************** */
+// PROFILE
+const profile = async (req, res) => {
   const userId = req.user.id;
-  const user = await User.findById({userId});
-  
+  const user = await User.findById({ userId });
+
   res.status(200).json({
-    success : true ,
-    message : 'find profile',
-    user
-  })
-}
+    success: true,
+    message: "find profile",
+    user,
+  });
+};
+/**************************************************************** */
+// FORGET PASSWORD TOKEN
+const forgotPasswordToken = async () => {
+  const { email } = req.body;
 
-const forgotPasswordToken = ()=>{
-   const {email} = req.body;
+  if (!email) {
+    return res.status(500).send("required email");
+  }
 
-   if(!email){
-    return res.status(500).send('required email');
-   }
+  const user = await User.findOne({ email });
 
-   const user = User.findOne({email}).select('+password');
+  if (!user) {
+    return res.status(500).send("email not exist");
+  }
 
-   if(!user){
-    return res.status(500).send('email not exist');
-   }
+  const resetToken = await user.generateResetPasswordToken();
 
-   const url = user.generateResetpasswordToken()
+  await user.save();
 
-}
-const resetPassword = ()=>{
+  const resetPasswordURL = `${process.env.FRONTEND_URL}/reset-password/${resetToken}`;
 
-}
+  const subject = `reset password link`;
+  const message = `You can reset your password by clicking <a href=${resetPasswordURL}>`;
 
+  try {
+    await sendEmail(email, subject, message);
 
-export{
-    register,
-    login,
-    logout,
-    profile,
+    res.status(200).json({
+      success: true,
+      message: `reset password token sent to ${email} successfully`,
+    });
+  } catch (e) {
+    user.forgetPasswordToken = undefined;
+    user.forgotPasswordExpiry = undefined;
+    user.save();
+    return res.status(500).send(`error occur ${e.message}`);
+  }
+};
+/**************************************************************** */
+// RESET PASSWORD USING TOKEN
+const resetPassword = async () => {
+  const { resetToken } = req.params;
+  const { password } = req.body;
+
+  const forgotPasswordToken = crypto
+    .createHash("sha256")
+    .update(resetToken)
+    .digest("hex");
+
+  const user = await User.findOne({
     forgotPasswordToken,
-    resetPassword
-}
+    forgotPasswordExpiry: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return res.status(500).send("invalid user");
+  }
+
+  user.password = password;
+  user.forgetPasswordToken = undefined;
+  user.forgotPasswordExpiry = undefined;
+  await user.save();
+};
+/**************************************************************** */
+// CHANGE PASSWORD WHILE LOGGEDIN
+const changePassword = async () => {
+  const userId = req.user.id;
+  const { oldPassword, newPassword } = req.body;
+
+  if (!oldPassword || !newPassword) {
+    return res.status(500).send("required password");
+  }
+
+  const user = await User.findById({ userId }).select("+password");
+
+  if (!user) {
+    return res.status(500).send("invalid user");
+  }
+  if (!comparePassword(oldPassword)) {
+    return res.status(500).send("old password are wrong");
+  }
+
+  user.password = newPassword;
+
+  await user.save();
+
+  user.password = undefined;
+
+  res.status(200).json({
+    success: true,
+    message: "changed password",
+    user,
+  });
+};
+
+export {
+  register,
+  login,
+  logout,
+  profile,
+  forgotPasswordToken,
+  resetPassword,
+  changePassword,
+};
