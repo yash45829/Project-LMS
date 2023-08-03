@@ -3,6 +3,7 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors'
 import morgan from 'morgan';
 import userRoutes from './routes/user.routes.js';
+import courseRoutes from './routes/course.routes.js'
 
 const app = express(); //created server using express
 
@@ -25,6 +26,9 @@ app.use('/hello',(req,res)=>{
 
 //USER ROUTE 
 app.use('/api/v1/user', userRoutes)
+
+// COURSE ROUTE 
+app.use('/api/v1/course', courseRoutes)
 
 //invalid routes
 app.all('*',(req,res)=>{
