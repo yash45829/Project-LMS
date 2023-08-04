@@ -2,6 +2,7 @@ import Course from "../models/course.model.js";
 import cloudinary from "cloudinary";
 import fs from "fs/promises";
 
+// LIST ALL COURSES
 const getAllCourses = async (req, res, next) => {
   try {
     const courses = await Course.find({}).select("-lectures");
@@ -15,6 +16,7 @@ const getAllCourses = async (req, res, next) => {
   }
 };
 
+// COURSE BY ID
 const getCoursesById = (req, res, next) => {
   try {
     const { id } = req.params;
@@ -31,6 +33,7 @@ const getCoursesById = (req, res, next) => {
   }
 };
 
+// CREATE COURSE (ADMIN)
 const createCourse = async (req, res, next) => {
   try {
     const { title, category, description, createdBy, thumbnail } = req.body;
@@ -49,6 +52,7 @@ const createCourse = async (req, res, next) => {
       },
     });
 
+    //  cloudinay upload 
     if (req.file) {
       const result = cloudinary.v2.uploader.upload(req.file.path, {
         folder: "lms",
@@ -73,6 +77,7 @@ const createCourse = async (req, res, next) => {
   }
 };
 
+// UPDATE COURSE (ADMIN)
 const updateCourse = (req, res, next) => {
   const id = req.params;
 
@@ -96,6 +101,7 @@ const updateCourse = (req, res, next) => {
   });
 };
 
+// DELETE COURSE (ADMIN)
 const deleteCourse = async (req, res, next) => {
   const id = req.params;
 
@@ -108,8 +114,46 @@ const deleteCourse = async (req, res, next) => {
   res.status(200).send({
     success: true,
     message: "course deleted",
-    course,
   });
+};
+
+// CREATE LECTURES TO COURSE BY ID (ADMIN)
+const createLecturesById = async (req, res, next) => {
+  const { id } = req.params;
+  const { title, description } = req.body;
+  if (!title || !description) {
+    res.status(500).send("title , descrption are not filled");
+  }
+  const course = await Course.findById(id);
+  if (!course) {
+    res.status(500).send("course not found");
+  }
+
+  const lectures = Course.create({
+    title,
+    description,
+    lecture: {
+      public_id: "",
+      secure_url: "",
+    },
+  });
+
+  //  cloudinay upload 
+  if (req.file) {
+    const result = cloudinary.v2.uploader.upload(req.file.path, {
+      folder: "lms",
+    });
+    if (result) {
+      lectures.lecture.public_id = await result.public_id;
+      lectures.lecture.secure_url = await result.secure_url;
+    }
+
+    fs.rm(`uploads/${req.file.filename}`);
+  }
+
+  course.push(lectures);
+
+  course.save();
 };
 
 export {
@@ -118,4 +162,5 @@ export {
   createCourse,
   updateCourse,
   deleteCourse,
+  createLecturesById,
 };

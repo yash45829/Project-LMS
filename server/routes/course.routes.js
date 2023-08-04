@@ -1,6 +1,7 @@
 import { Router } from "express";
 import {
   createCourse,
+  createLecturesById,
   deleteCourse,
   getAllCourses,
   getCoursesById,
@@ -15,13 +16,24 @@ const router = Router();
 router
   .route("/")
   .get(getAllCourses)
-  .post(isLoggedIn, autharizedRoles('ADMIN'), upload.single("thumbnail"), createCourse);
+  .post(
+    isLoggedIn,
+    autharizedRoles("ADMIN"),
+    upload.single("thumbnail"),
+    createCourse
+  );
 
-//  COURSE BY ID , { UPDATE & DELETE COURSES (ADMIN) }
+//  COURSE BY ID , { UPDATE & DELETE COURSES , ADD LECTURES (ADMIN) }
 router
   .route("/:id")
   .get(isLoggedIn, getCoursesById)
-  .put(isLoggedIn, autharizedRoles('ADMIN'), updateCourse)
-  .delete(isLoggedIn, autharizedRoles('ADMIN'), deleteCourse);
+  .put(isLoggedIn, autharizedRoles("ADMIN"), updateCourse)
+  .delete(isLoggedIn, autharizedRoles("ADMIN"), deleteCourse)
+  .post(
+    isLoggedIn,
+    autharizedRoles("ADMIN"),
+    upload.single("lecture"),
+    createLecturesById
+  );
 
 export default router;

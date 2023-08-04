@@ -21,7 +21,7 @@ const courseSchema = new Schema({
         description:{
             type:"String"
         },
-        thumbnail:{
+        lecture:{
             public_id: "PUBLIC_ID",
             secure_url: "SECURE_URL"
         }
