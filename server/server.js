@@ -6,8 +6,7 @@ import {v2 as cloudinary} from 'cloudinary';
 
 
 const PORT = process.env.PORT || 5002;
-
-          
+      
 cloudinary.config({ 
   cloud_name: process.env.CLOUD_NAME, 
   api_key: process.env.API_KEY, 

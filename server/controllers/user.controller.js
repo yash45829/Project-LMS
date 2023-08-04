@@ -52,7 +52,7 @@ const register = async (req, res) => {
         crop: "fill",
       });
       if (result) {
-        user.avatar.public_id = (await result).public_id;
+        user.avatar.public_id = await result.public_id;
         user.avatar.secure_url = (await result).secure_url;
 
         // fs.rm(`uploads/${req.file.filename}`)
