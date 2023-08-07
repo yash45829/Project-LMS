@@ -1,4 +1,4 @@
-import mongoose, { model, Schema } from "mongoose";
+import { model, Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -41,6 +41,10 @@ const userSchema = new Schema(
     },
     forgetPasswordToken: String,
     forgotPasswordExpiry: Date,
+    subscription: {
+      id: "String",
+      status: "String",
+    },
   },
   {
     timestamp: true,
@@ -57,7 +61,7 @@ userSchema.pre("save", async function (next) {
 
 // User Methods
 userSchema.methods = {
-//   GENERATE TOKEN 
+  //   GENERATE TOKEN
   generateJWTToken: async function () {
     return await jwt.sign(
       {
@@ -74,17 +78,17 @@ userSchema.methods = {
       }
     );
   },
-// PASSWORD MATCHING 
+  // PASSWORD MATCHING
   comparePassword: async function (rawPassword) {
     return bcrypt.compare(rawPassword, this.password);
   },
 
-//  GENERATE RESET PW TOKEN 
+  //  GENERATE RESET PW TOKEN
   generateResetPasswordToken: () => {
     const resetToken = crypto.randomBytes(20).toString("hex");
 
     this.forgetPasswordToken = crypto
-      .createHash('sha256')
+      .createHash("sha256")
       .update(resetToken)
       .digest("hex");
     this.forgotPasswordExpiry = Date.now() + 15 * 60 * 1000;

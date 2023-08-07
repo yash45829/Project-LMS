@@ -1,25 +1,37 @@
 import { Router } from 'express';
+import { autharizedRoles, isLoggedIn } from '../middlewares/auth.middleware';
 
 const router = Router() ;
 
 router
 .route("/razorpay-key")
-.get(razorpayKey)
+.get(
+    isLoggedIn,
+    razorpayKey)
 
 router
 .route("/subscribe")
-.post(buySubscription)
+.post(
+    isLoggedIn,
+    buySubscription)
 
 router
 .route("/verify")
-.post(verifySubscription)
+.post(
+    isLoggedIn,
+    verifySubscription)
 
 router
 .route("unsubscribe")
-.post(cancelSubscription)
+.post(
+    isLoggedIn,
+    cancelSubscription)
 
 router
 .route("/")
-.get(allpayments)
+.get(
+    isLoggedIn,
+    autharizedRoles('ADMIN'),
+    allpayments)
 
 export default router;
