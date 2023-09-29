@@ -6,9 +6,9 @@ import {
   getAllCourses,
   getCoursesById,
   updateCourse,
-} from "../controllers/course.controller";
+} from "../controllers/course.controller.js";
 import { autharizedRoles, isLoggedIn } from "../middlewares/auth.middleware.js";
-import upload from "../middlewares/multer.middleware";
+import upload from "../middlewares/multer.middleware.js";
 
 const router = Router();
 

@@ -22,16 +22,16 @@ const courseSchema = new Schema({
             type:"String"
         },
         lecture:{
-            public_id: "PUBLIC_ID",
-            secure_url: "SECURE_URL"
+            public_id: "String",
+            secure_url: "String"
         }
     },
     createdBy:{
         type:"String"
     },
     thumbnail:{
-        public_id: "PUBLIC_ID",
-        secure_url: "SECURE_URL"
+        public_id: "String",
+        secure_url: "String"
     },
     noOfLectures:{
         type: "Number",

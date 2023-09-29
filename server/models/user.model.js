@@ -1,4 +1,4 @@
-import { model, Schema } from "mongoose";
+import mongoose, { model, Schema } from "mongoose";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
@@ -97,5 +97,5 @@ userSchema.methods = {
   },
 };
 
-const User = model("User", userSchema);
+const User = mongoose.model("User", userSchema);
 export default User;

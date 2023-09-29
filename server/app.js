@@ -4,7 +4,8 @@ import cors from 'cors'
 import morgan from 'morgan';
 import userRoutes from './routes/user.routes.js';
 import courseRoutes from './routes/course.routes.js'
-
+import dotenv from 'dotenv'
+dotenv.config();
 const app = express(); //created server using express
 
 app.use(morgan('dev')) // for logging 
