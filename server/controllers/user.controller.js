@@ -84,25 +84,40 @@ const register = async (req, res) => {
 // LOGIN
 const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
-
+    const {email, password} = await req.body;
+    console.log(req.body)
+    console.log(email)
+    console.log(password)
+  console.log("start");
     if (!email) {
-      return res.status(500).send("required email");
+      return res.status(500).json({
+        message: "email not match"
+      })
     }
+  console.log("starting");
+
     if (!password) {
       return res.status(500).send("required password");
     }
+    console.log("started");
 
-    const user = await User.findOne({ email }).select("+password");
-
+   
+   const user = await User.findOne({ email }).select("+password");
+   console.log(user.password)
+  console.log("pending")
     if (!user || !comparePassword(password)) {
       return res.status(500).send("email or password are wrong");
     }
+    // if (!user || !(user.password == password)) {
+    //   return res.status(500).send("email or password are wrong");
+    // }
+    console.log("done");
 
     user.password = undefined;
     const token = await user.generateJWTToken();
 
     res.cookie("token", token, cookieOptions);
+    console.log("ok");
 
     res.status(200).json({
       success: true,

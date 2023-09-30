@@ -22,8 +22,8 @@ const userSchema = new Schema(
     password: {
       required: [true, "is required"],
       type: "String",
-      trim: true,
-      minLength: [4, "min length is 4"],
+      // trim: true,
+      // minLength: [4, "min length is 4"],
       select: false,
     },
     avatar: {
@@ -80,8 +80,9 @@ userSchema.methods = {
   },
   // PASSWORD MATCHING
   comparePassword: async function (rawPassword) {
-    return bcrypt.compare(rawPassword, this.password);
-  },
+    const check = await bcrypt.compare(rawPassword, this.password);
+   return check ;
+},
 
   //  GENERATE RESET PW TOKEN
   generateResetPasswordToken: () => {
