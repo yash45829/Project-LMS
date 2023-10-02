@@ -1,10 +1,11 @@
-import express from 'express'
+import express from 'express';
 import cookieParser from 'cookie-parser';
-import cors from 'cors'
+import cors from 'cors';
 import morgan from 'morgan';
 import userRoutes from './routes/user.routes.js';
-import courseRoutes from './routes/course.routes.js'
-import dotenv from 'dotenv'
+import courseRoutes from './routes/course.routes.js';
+import miscellaneousRoutes from './routes/miscellaneous.routes.js';
+import dotenv from 'dotenv';
 dotenv.config();
 const app = express(); //created server using express
 
@@ -30,6 +31,9 @@ app.use('/api/v1/user', userRoutes)
 
 // COURSE ROUTE 
 app.use('/api/v1/course', courseRoutes)
+//MISCELLANEOUS ROUTES
+app.use('/api/v1/miscellaneous', miscellaneousRoutes)
+
 
 //invalid routes
 app.all('*',(req,res)=>{

@@ -6,9 +6,9 @@ import fs from "fs/promises";
 const getAllCourses = async (req, res, next) => {
   try {
     const courses = await Course.find({}).select("-lectures");
-    res.status(200).send({
+    res.status(200).json({
       success: true,
-      message: "courses",
+      message: "courses loaded ",
       courses,
     });
   } catch (e) {
@@ -23,7 +23,7 @@ const getCoursesById = (req, res, next) => {
 
     const course = Course.findById({ id });
 
-    res.status(200).send({
+    res.status(200).json({
       success: true,
       message: "courses",
       lecture: course.lectures,
@@ -67,7 +67,7 @@ const createCourse = async (req, res, next) => {
 
     await course.save();
 
-    res.status(200).send({
+    res.status(200).json({
       success: true,
       message: "courses",
       course,
@@ -94,7 +94,7 @@ const updateCourse = (req, res, next) => {
     res.status(500).send(" no course exist");
   }
 
-  res.status(200).send({
+  res.status(200).json({
     success: true,
     message: "course updated",
     course,
@@ -111,7 +111,7 @@ const deleteCourse = async (req, res, next) => {
     res.status(500).send("course not deleted");
   }
 
-  res.status(200).send({
+  res.status(200).json({
     success: true,
     message: "course deleted",
   });
