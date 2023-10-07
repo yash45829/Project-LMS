@@ -3,8 +3,8 @@ import dotenv from "dotenv";
 dotenv.config();
 
 // LOGIN CHECKPOINT
-const isLoggedIn = (req, res, next) => {
-  const { token } = req.cookie;
+const isLoggedIn =async (req, res, next) => {
+  const { token } = req.cookies;
   if (!token) {
     res.status(401).json({
       success: false,
@@ -13,7 +13,8 @@ const isLoggedIn = (req, res, next) => {
   }
 
   const userDetail = jwt.verify(token, process.env.JWT_SECRET);
-  res.user = userDetail;
+  console.log("userDetail" , userDetail)
+  req.user = await userDetail;
 
   next();
 };
@@ -22,6 +23,7 @@ const isLoggedIn = (req, res, next) => {
 const autharizedRoles =
   (...roles) =>
   async (req, res, next) => {
+    console.log("req.user" , req.user);
     const userControl = req.user.role;
     if (!roles.includes(userControl)) {
       res.status(400).send("Admin can change this action");

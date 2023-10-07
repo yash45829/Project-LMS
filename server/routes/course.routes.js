@@ -13,10 +13,9 @@ import upload from "../middlewares/multer.middleware.js";
 const router = Router();
 
 // ACCESS COURSES , CREATE COURSES (ADMIN)
-router
-  .route("/")
-  .get(getAllCourses)
-  .post(
+router.get('/',getAllCourses)
+
+router.post('/createCourse',
     isLoggedIn,
     autharizedRoles("ADMIN"),
     upload.single("thumbnail"),
@@ -25,7 +24,7 @@ router
 
 //  COURSE BY ID , { UPDATE & DELETE COURSES , ADD LECTURES (ADMIN) }
 router
-  .route("/:id")
+  .route('/:id')
   .get(isLoggedIn, getCoursesById)
   .put(isLoggedIn, autharizedRoles("ADMIN"), updateCourse)
   .delete(isLoggedIn, autharizedRoles("ADMIN"), deleteCourse)

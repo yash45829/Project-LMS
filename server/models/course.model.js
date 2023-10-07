@@ -11,7 +11,7 @@ const courseSchema = new Schema({
     description:{
         type: "String",
         required : [true,"title is required"],
-        minLength : [80,"minimum 100 characters required"]
+        // minLength : [80,"minimum 100 characters required"]
 
     },
     lectures:{
