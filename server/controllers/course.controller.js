@@ -6,13 +6,20 @@ import fs from "fs/promises";
 const getAllCourses = async (req, res, next) => {
   try {
     const courses = await Course.find({}).select("-lectures");
+    if(!courses){
+      return res.status(500).json({
+        message : "no course available"
+      })
+    }
     res.status(200).json({
       success: true,
       message: "courses loaded ",
       courses,
     });
   } catch (e) {
-    res.status(500).send(e.message);
+    return res.status(500).json({
+      message : e.message 
+    })
   }
 };
 
@@ -36,14 +43,13 @@ const getCoursesById = (req, res, next) => {
 // CREATE COURSE (ADMIN)
 const createCourse = async (req, res, next) => {
   try {
-    const { title, category, description, createdBy, thumbnail } = req.body;
+    const { title, category, description, createdBy} = req.body;
 
     if (!title || !category || !description || !createdBy) {
       res.status(500).json({
         message : " fields are required"
       });
     }
-    console.log("creating course" , title)
     const course = await Course.create({
       title,
       category,
@@ -54,31 +60,27 @@ const createCourse = async (req, res, next) => {
         secure_url: "",
       }
     });
-    console.log(" course uploading" )
 
     if(!course){
       return res.status(500).json({
         message: "not created"
       })
     }
-    console.log(" course created" )
 
     //  cloudinay upload 
     if (req.file) {
-      const result = cloudinary.v2.uploader.upload(req.file.path, {
+      const result = await cloudinary.v2.uploader.upload(req.file.path, {
         folder: "lms",
       });
       if (result) {
-        course.thumbnail.public_id = await result.public_id;
-        course.thumbnail.secure_url = await result.secure_url;
+       course.thumbnail.public_id =  result.public_id;
+        course.thumbnail.secure_url =  result.secure_url; 
       }
 
       fs.rm(`uploads/${req.file.filename}`);
     }
-    console.log(" course saving" )
  
     await course.save();
-    console.log(" course saved")
 
     res.status(200).json({
       success: true,

@@ -13,7 +13,7 @@ import upload from "../middlewares/multer.middleware.js";
 const router = Router();
 
 // ACCESS COURSES , CREATE COURSES (ADMIN)
-router.get('/',getAllCourses)
+router.get('/getAllCourses',getAllCourses)
 
 router.post('/createCourse',
     isLoggedIn,
@@ -23,16 +23,16 @@ router.post('/createCourse',
   );
 
 //  COURSE BY ID , { UPDATE & DELETE COURSES , ADD LECTURES (ADMIN) }
-router
-  .route('/:id')
-  .get(isLoggedIn, getCoursesById)
-  .put(isLoggedIn, autharizedRoles("ADMIN"), updateCourse)
-  .delete(isLoggedIn, autharizedRoles("ADMIN"), deleteCourse)
-  .post(
-    isLoggedIn,
-    autharizedRoles("ADMIN"),
-    upload.single("lecture"),
-    createLecturesById
-  );
+// router
+//   .route('/:id')
+//   .get(isLoggedIn, getCoursesById)
+//   .put(isLoggedIn, autharizedRoles("ADMIN"), updateCourse)
+//   .delete(isLoggedIn, autharizedRoles("ADMIN"), deleteCourse)
+//   .post(
+//     isLoggedIn,
+//     autharizedRoles("ADMIN"),
+//     upload.single("lecture"),
+//     createLecturesById
+//   );
 
 export default router;
