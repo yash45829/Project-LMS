@@ -97,7 +97,7 @@ const cancelSubscription = async (req, res, next) => {
       res.status(500).send(" you are not logged in");
     }
 
-    if (user.role === "ADMIN") {
+    if (user.role !== "ADMIN") {
       res.status(500).send(" you are not admin boy");
     }
 

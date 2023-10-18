@@ -143,18 +143,85 @@ const logout = (req, res) => {
 // PROFILE
 const profile = async (req, res) => {
   try {
-    const userId = req.user.id;
-    const user = await User.findById({ userId });
+    const userId = await  req.user.id;
+    const user = await User.findById(userId);
 
+    if(!user){
+    res.status(500).json({
+      message : "user not find"
+    });
+
+    }
     res.status(200).json({
       success: true,
       message: "find profile",
       user,
     });
   } catch (error) {
-    res.status(400).send(e.message);
+    res.status(400).send(error.message);
   }
 };
+
+/**************************************************************** */
+// UPDATE USER PROFILE
+const updateProfile = async (req, res, next) => {
+
+    const { firstname } = await req.body;
+    const { id } = req.params;
+
+    const user = await User.findById(id);
+  
+    if (!user) {
+      return res.status(500).json({
+        message: "no user exist",
+      });
+    }
+  
+    if (firstname) {
+      user.firstname = firstname;
+    }
+  
+ 
+    if (req.file) {
+    
+      await cloudinary.v2.uploader.destroy(user.avatar.public_id);
+  
+      try {
+        const result = await cloudinary.v2.uploader.upload(req.file.path, {
+          folder: 'lms', 
+          width: 250,
+          height: 250,
+          gravity: 'faces', 
+          crop: 'fill',
+        });
+  
+        
+        if (result) {
+          
+          user.avatar.public_id = result.public_id;
+          user.avatar.secure_url = result.secure_url;
+  
+         
+          fs.rm(`uploads/${req.file.filename}`);
+        }
+      } catch (error) {
+        return  res.status(500).json({
+          message: error.message    
+        });
+      }
+    }
+  
+    // Save the user object
+    await user.save();
+  
+    res.status(200).json({
+      success: true,
+      message: "profile update",
+      user,
+    });
+};
+
+
 /**************************************************************** */
 // FORGET PASSWORD TOKEN
 const forgotPasswordToken = async () => {
@@ -267,6 +334,7 @@ export {
   login,
   logout,
   profile,
+  updateProfile,
   forgotPasswordToken,
   resetPassword,
   changePassword,

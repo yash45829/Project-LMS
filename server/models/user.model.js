@@ -43,7 +43,10 @@ const userSchema = new Schema(
     forgotPasswordExpiry: Date,
     subscription: {
       id: "String",
-      status: "String",
+      status: {
+        type : "String",
+        default : "inactive"
+      },
     },
   },
   {
