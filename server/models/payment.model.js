@@ -6,7 +6,7 @@ const paymentSchema = new Schema(
       type: "String",
       required: true,
     },
-    signature: {
+    razorpay_signature: {
       type: "String",
       required: true,
     },

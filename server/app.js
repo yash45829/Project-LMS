@@ -4,6 +4,7 @@ import cors from 'cors';
 import morgan from 'morgan';
 import userRoutes from './routes/user.routes.js';
 import courseRoutes from './routes/course.routes.js';
+import paymentRoutes from './routes/payment.routes.js';
 import miscellaneousRoutes from './routes/miscellaneous.routes.js';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -31,6 +32,8 @@ app.use('/api/v1/user', userRoutes)
 
 // COURSE ROUTE 
 app.use('/api/v1/course', courseRoutes)
+//PAYMENT ROUTE
+app.use('/api/v1/payments', paymentRoutes )
 //MISCELLANEOUS ROUTES
 app.use('/api/v1/miscellaneous', miscellaneousRoutes)
 

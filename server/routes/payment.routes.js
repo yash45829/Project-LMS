@@ -1,5 +1,13 @@
 import { Router } from 'express';
-import { autharizedRoles, isLoggedIn } from '../middlewares/auth.middleware';
+import { autharizedRoles, isLoggedIn } from '../middlewares/auth.middleware.js';
+import { 
+    allpayments,
+    buySubscription,
+    cancelSubscription,
+    razorpayKey, 
+    verifySubscription 
+} 
+from '../controllers/payment.controller.js';
 
 const router = Router() ;
 
