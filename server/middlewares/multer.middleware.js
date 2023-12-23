@@ -1,7 +1,7 @@
 import path from "path";
 import multer from "multer";
 
-// not completed
+
 const upload = multer({
   // dest : "uploads/",
   limits: { fileSize: 100 * 1024 * 1024 },

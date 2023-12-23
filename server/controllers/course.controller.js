@@ -27,14 +27,12 @@ const getAllCourses = async (req, res, next) => {
 const getCoursesById = async (req, res, next) => {
   try {
     const { id } = req.params;
-    console.log(id);
     const course = await Course.findById(id);
     if (!course) {
       return res.status(500).json({
         message: "no course found",
       });
     }
-    console.log(course);
 
     res.status(200).json({
       success: true,
@@ -213,7 +211,6 @@ const createLecturesById = async (req, res, next) => {
     lecture: {},
   };
 
-  console.log("lecture");
   //  cloudinay upload
   try {
     if (req.file) {
@@ -223,7 +220,6 @@ const createLecturesById = async (req, res, next) => {
         resource_type: "video",
       });
       if (result) {
-        console.log(result);
         lectureData.lecture.public_id = await result.public_id;
         lectureData.lecture.secure_url = await result.secure_url;
       }
@@ -235,12 +231,10 @@ const createLecturesById = async (req, res, next) => {
       message: error.message,
     });
   }
-  console.log("upload");
 
   course.lectures.push(lectureData);
 
   course.noOfLectures = course.lectures.length;
-  console.log("done");
   await course.save();
   res.status(200).json({
     success: true,

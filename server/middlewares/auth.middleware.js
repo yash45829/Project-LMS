@@ -13,7 +13,6 @@ const isLoggedIn =async (req, res, next) => {
   }
 
   const userDetail = jwt.verify(token, process.env.JWT_SECRET);
-  console.log("userDetail" , userDetail)
   req.user = await userDetail;
 
   next();
@@ -23,7 +22,6 @@ const isLoggedIn =async (req, res, next) => {
 const autharizedRoles =
   (...roles) =>
   async (req, res, next) => {
-    console.log("req.user" , req.user);
     const userControl = req.user.role;
     if (!roles.includes(userControl)) {
       res.status(400).send("Admin can change this action");

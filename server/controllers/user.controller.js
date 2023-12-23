@@ -42,7 +42,6 @@ const register = async (req, res) => {
     }
 
     // uploading file to cloudinary
-    console.log(req.file);
     if (req.file) {
       try {
         const result = cloudinary.v2.uploader.upload(req.file.path, {

@@ -56,11 +56,9 @@ const buySubscription = async (req, res, next) => {
 // VERIFY SUBSCRIPTION
 const verifySubscription = async (req, res, next) => {
   try {
-    console.log("1")
     const id = await req.user.id;
     const { razorpay_payment_id,razorpay_subscription_id,razorpay_signature } =
      await req.body;
-    console.log("2")
 
     const user = await User.findById(id);
 
@@ -68,7 +66,6 @@ const verifySubscription = async (req, res, next) => {
     if (!user) {
      return res.status(500).send(" you are not logged in");
     }
-    console.log("3")
 
     const subscriptionid =await user.subscription.id;
 
@@ -77,25 +74,20 @@ const verifySubscription = async (req, res, next) => {
       .update(`${razorpay_payment_id}|${subscriptionid}`)
       .digest('hex');
 
-      console.log("4")
 
     if (generatedSignature !== razorpay_signature) {
      return  res.status(500).send("subscription not verified");
     }
-    console.log("5")
 
     await Payment.create({
       razorpay_payment_id,
       razorpay_signature,
       razorpay_subscription_id,
     });
-    console.log("6")
 
     user.subscription.status = "active";
-    console.log("7")
 
     await user.save();
-    console.log("8")
 
     return res.status(200).send({
       success: true,
@@ -110,7 +102,6 @@ const verifySubscription = async (req, res, next) => {
 const cancelSubscription = async (req, res, next) => {
   try {
     const { id } =await  req.user;
-    console.log(id)
     const user = await User.findById(id);
 
     if (!user) {
