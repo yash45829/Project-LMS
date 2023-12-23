@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import { autharizedRoles, isLoggedIn } from '../middlewares/auth.middleware.js';
 import { 
-    allpayments,
+    allPayments,
     buySubscription,
     cancelSubscription,
     razorpayKey, 
@@ -40,6 +40,6 @@ router
 .get(
     isLoggedIn,
     autharizedRoles('ADMIN'),
-    allpayments)
+    allPayments)
 
 export default router;

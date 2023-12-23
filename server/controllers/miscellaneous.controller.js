@@ -1,3 +1,4 @@
+import User from "../models/user.model.js";
 import sendEmail from "../utils/sendEmail.js";
 
 
@@ -31,3 +32,26 @@ export const contactUs = async (req, res, next) => {
   }
 
 };
+
+export const userStats = async (req,res,next)=>{
+try {
+   const allUserCount = await User.countDocuments();
+
+   const subscribedCount = await User.countDocuments({
+    'subscription.status': 'active'
+   })
+
+   res.status(200).json({
+    success : true,
+    message : "userstat",
+    allUserCount,
+    subscribedCount
+
+   })
+  } catch (error) {
+    res.status(500).json({
+    error : error.message 
+  
+     })
+  }
+}

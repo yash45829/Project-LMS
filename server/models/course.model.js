@@ -14,18 +14,17 @@ const courseSchema = new Schema({
         // minLength : [80,"minimum 100 characters required"]
 
     },
-    lectures:{
-        title:{
-            type:"String"
-        },
-        description:{
-            type:"String"
-        },
-        lecture:{
+    lectures: [
+        {
+          title: "String",
+          description: "String",
+          lecture: {
             public_id: "String",
             secure_url: "String"
-        }
-    },
+          },
+        },
+      ],
+    
     createdBy:{
         type:"String"
     },
@@ -45,3 +44,4 @@ const courseSchema = new Schema({
 
 const Course = model("COURSE",courseSchema);
 export default Course;
+
